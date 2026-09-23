@@ -222,6 +222,16 @@ void rvWeaponRocketLauncher::OnLaunchProjectile ( idProjectile* proj ) {
 	idEntityPtr<idEntity> ptr;
 	ptr = proj;
 	guideEnts.Append ( ptr );	
+	
+	if (proj && proj->IsType(idGuidedProjectile::GetClassType())) {
+		idGuidedProjectile* g = static_cast<idGuidedProjectile*>(proj);
+		// quick speed boost
+		g->SetSpeed(g->GetSpeed() * 1.5f, 500);
+		// random lateral
+		idVec3 nudge = playerViewAxis[1] * ((gameLocal.random.RandomFloat() - 0.5f) * 128.0f)
+			+ playerViewAxis[2] * ((gameLocal.random.RandomFloat() - 0.5f) * 128.0f);
+		g->GuideTo(g->GetPhysics()->GetOrigin() + playerViewAxis[0] * 256.0f + nudge);
+	}
 }
 
 /*
