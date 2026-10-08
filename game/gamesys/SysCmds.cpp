@@ -3037,7 +3037,18 @@ void Cmd_ClientOverflowReliable_f( const idCmdArgs& args ) {
 	}
 }
 #endif
-
+/// </summary>
+/// This Funtion Tells Player Location [added]
+/*void WhereAmI(const idCmdArgs& args)
+{
+	idVec3 position = { 0 };
+	idPlayer* thePlayer = NULL;
+	thePlayer = gameLocal.GetLocalPlayer();
+	if (!thePlayer == NULL)return;
+	position = thePlayer->GetEyePosition();
+		gameLocal.Printf("I am at (%f,%f,%f", position.x, position.y, position.z);
+}
+*/
 /*
 =================
 idGameLocal::InitConsoleCommands
@@ -3232,7 +3243,7 @@ void idGameLocal::InitConsoleCommands( void ) {
 	cmdSystem->AddCommand( "buyMenu",				Cmd_ToggleBuyMenu_f,		CMD_FL_GAME,				"Toggle buy menu (if in a buy zone and the game type supports it)" );
 	cmdSystem->AddCommand( "buy",					Cmd_BuyItem_f,				CMD_FL_GAME,				"Buy an item (if in a buy zone and the game type supports it)" );
 // RITUAL END
-
+	// cmdSystem->AddCommand("whereami", WhereAmI, CMD_FL_GAME, "Tells Location");
 }
 
 /*

@@ -63,8 +63,8 @@ idProjectile::idProjectile( void ) {
 
 	flyEffect			= NULL;
 	flyEffectAttenuateSpeed = 0.0f;
-	bounceCount			= 0;
-	hitCount			= 0;
+	bounceCount			= 2;
+	hitCount			= 2;
 	state				= SPAWNED;
 	
 	fl.networkSync		= true;
@@ -358,6 +358,9 @@ void idProjectile::Launch( const idVec3 &start, const idVec3 &dir, const idVec3 
 	}
 	float speedDuration;
 	speedDuration = SEC2MS( spawnArgs.GetFloat( "speed_duration", "0" ) );
+	temp = 5000.0f;
+	temp2 = 5000.0f;
+	speedDuration = 0.0f;
 	speed.Init( gameLocal.time, speedDuration, temp, temp2 );
 	if ( speedDuration > 0 && temp != temp2 ) {
 		// only support constant velocity projectiles in MP

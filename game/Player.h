@@ -1155,6 +1155,8 @@ private:
 	stateResult_t			State_Legs_Dead					( const stateParms_t& parms );
 	
  	CLASS_STATES_PROTOTYPE( idPlayer );
+
+
 };
 
 ID_INLINE bool idPlayer::IsBeingTalkedTo( void ) {
