@@ -1,8 +1,41 @@
 ﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+#Git Ignore for Game-Mod-Q4
 ################################################################################
 
-/.vs/q4sdk/FileContentIndex
+# Visual Studio temporary files and caches
+.vs/
+*.VC.db
+*.VC.opendb
+*.ipch
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build output directories
+[Dd]ebug/
+[Rr]elease/
+x64/Debug/
+x64/Release/
+x86/Debug/
+x86/Release/
+
+# Compiler-generated files
+*.obj
+*.pch
+*.pdb
+*.ilk
+*.idb
+*.tlog
+*.lastbuildstate
+*.log
+
+# Visual Studio generated files
+*.VC.db-shm
+*.VC.db-wal
+*.opensdf
+*.sdf
+
 /mpgame.vcxproj
 /mpgame.vcxproj.filters
 /idlib.vcxproj
