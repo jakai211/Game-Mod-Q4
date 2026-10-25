@@ -203,6 +203,7 @@ public:
 	int						powerups;
 	int						armor;
 	int						maxarmor;
+	int						Zom_points;
 	int						ammo[ MAX_AMMO ];
 	int						clip[ MAX_WEAPONS ];
 	int						powerupEndTime[ POWERUP_MAX ];
@@ -554,7 +555,7 @@ public:
 	
 	bool					PowerUpActive				( int powerup ) const;
 	float					PowerUpModifier				( int type );
-	void					ClearPowerup				( int i );
+	void					Clear				( int i );
 	const char*				GetArenaPowerupString		( void );
 
 	// Helper methods to retrieving dictionaries
@@ -1004,6 +1005,8 @@ private:
 	int						oldInventoryWeapons;
 
 	const idDeclEntityDef*	itemCosts;
+
+
 
 	bool					WantSmoothing( void ) const;
 	void					PredictionErrorDecay( void );

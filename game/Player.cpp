@@ -206,6 +206,7 @@ void idInventory::Clear( void ) {
 	armor				= 0;
 	maxarmor			= 0;
 	secretAreasDiscovered = 0;
+	Zom_points = 0;
 
 	memset( ammo, 0, sizeof( ammo ) );
 
@@ -3436,6 +3437,9 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 		UpdateHudAmmo( _hud );
 	}
 	
+	//Zombies Points to show in HUD
+	_hud->SetStateInt("Zom_points", inventory.Zom_points);
+
 	_hud->StateChanged( gameLocal.time );
 }
 
