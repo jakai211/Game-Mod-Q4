@@ -555,7 +555,7 @@ public:
 	
 	bool					PowerUpActive				( int powerup ) const;
 	float					PowerUpModifier				( int type );
-	void					Clear				( int i );
+	void					ClearPowerup				( int i );
 	const char*				GetArenaPowerupString		( void );
 
 	// Helper methods to retrieving dictionaries

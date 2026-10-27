@@ -3439,6 +3439,7 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	
 	//Zombies Points to show in HUD
 	_hud->SetStateInt("Zom_points", inventory.Zom_points);
+	_hud->SetStateInt("Zom_round", spawnArgs.GetInt("Zom_round", "0"));
 
 	_hud->StateChanged( gameLocal.time );
 }
