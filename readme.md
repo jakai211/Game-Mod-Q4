@@ -24,12 +24,11 @@ A Call of Duty Zombies-inspired mod for Quake 4. Players survive waves of enemie
 - Weapon shop
 - Enemy loot drops
 
-## Perks
-1.
-2.
-3.
-4.
-5.
-
+## Powerups
+1. **Max Ammo** — Refills ammunition reserves.
+2. **Insta-Kill** — Kills zombies with one damaging hit for 30 seconds.
+3. **Double Points** — Doubles zombie kill points for 30 seconds.
+4. **Nuke** — Kills all currently living wave zombies and awards 400 points.
+5. **Bonus Points** — Instantly awards 500 points.
 
 **Survive.**
