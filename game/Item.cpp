@@ -1141,10 +1141,17 @@ void idItemPowerup::Spawn( void ) {
 idItemPowerup::GiveToPlayer
 ================
 */
-bool idItemPowerup::GiveToPlayer( idPlayer *player ) {
-	if ( player == NULL || player->spectating ) {
+bool idItemPowerup::GiveToPlayer(idPlayer* player) {
+	if (player == NULL || player->spectating) {
 		return false;
 	}
+	
+
+	const char* effect = spawnArgs.GetString("zombies_effect");
+	if (effect[0]) { 
+		return player->GiveZombiePickup(effect); 
+	}
+
 
 	// only one arena CTF powerup at a time
 	if ( type >= POWERUP_AMMOREGEN && type <= POWERUP_SCOUT ) {

@@ -2484,6 +2484,15 @@ void idActor::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &dir
 	}
 // RAVEN END
 
+	if (!gameLocal.isMultiplayer && health > 0 && damage > 0 &&
+		spawnArgs.GetBool("zombies_enemy") && attacker->IsType(idPlayer::GetClassType())) {
+		idPlayer* player = static_cast<idPlayer*>(attacker);
+		if ((player->inventory.Zom_instaKillEnd > gameLocal.time ||
+			damageDef->GetBool("zombies_nuke")) && damage < health) {
+			damage = health;
+		}
+	}
+
 	if ( damage > 0 ) {
 		int oldHealth = health;
 		AdjustHealthByDamage ( damage );

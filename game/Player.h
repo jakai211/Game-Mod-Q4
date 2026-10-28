@@ -203,7 +203,9 @@ public:
 	int						powerups;
 	int						armor;
 	int						maxarmor;
-	int						Zom_points;
+	int						Zom_points;	
+	int						Zom_doublePointsEnd;
+	int						Zom_instaKillEnd;
 	int						ammo[ MAX_AMMO ];
 	int						clip[ MAX_WEAPONS ];
 	int						powerupEndTime[ POWERUP_MAX ];
@@ -548,6 +550,8 @@ public:
 
 	// Powerups
 	bool					GivePowerUp					( int powerup, int time, bool team = false );
+	bool					GiveZombiePickup			(const char* effect);
+	void					ShowZombiePickupMessage		(const char* message);
 	void					ClearPowerUps				( void );
 
 	void					StartPowerUpEffect			( int powerup );

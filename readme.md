@@ -24,14 +24,6 @@ A Call of Duty Zombies-inspired mod for Quake 4. Players survive waves of enemie
 - Weapon shop
 - Enemy loot drops
 
-## Testing
-1. Launch the mod using the shortcut.
-2. Confirm the custom HUD appears.
-3. Verify enemies spawn in waves.
-4. Kill enemies and check that points increase.
-5. Test weapon purchases and perks.
-6. Check that enemies drop loot.
-
 ## Perks
 1.
 2.

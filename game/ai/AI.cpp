@@ -1627,11 +1627,25 @@ void idAI::Killed( idEntity *inflictor, idEntity *attacker, int damage, const id
 
 	aifl.dead = true;
 
-	//Adding a trigger to award points if Zombie is killed
-	if (attacker && attacker->IsType(idPlayer::GetClassType())) {
+	// Zombies rewards and drops. Nuke deaths retain normal death callbacks.
+	if (!gameLocal.isMultiplayer && spawnArgs.GetBool("zombies_enemy") &&
+		!spawnArgs.GetBool("zombies_nuked") && attacker && attacker->IsType(idPlayer::GetClassType())) {
 		idPlayer* player = static_cast<idPlayer*>(attacker);
-		player->inventory.Zom_points += 100;
+		player->inventory.Zom_points +=
+			player->inventory.Zom_doublePointsEnd > gameLocal.time ? 200 : 100;
+		if (gameLocal.random.RandomFloat() < 0.10f) {
+			static const char* drops[] = {
+				"zombies_max_ammo", "zombies_insta_kill", "zombies_double_points",
+				"zombies_nuke", "zombies_bonus_points"
+			};
+			idDict args;
+			args.Set("classname", drops[gameLocal.random.RandomInt(5)]);
+			args.SetVector("origin", GetPhysics()->GetOrigin() + idVec3(0, 0, 24));
+			args.SetBool("dropped", true);
+			gameLocal.SpawnEntityDef(args);
+		}
 	}
+
 
 	// turn off my flashlight, if I had one
 	ProcessEvent( &AI_Flashlight, false );

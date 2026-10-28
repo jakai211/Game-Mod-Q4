@@ -207,6 +207,8 @@ void idInventory::Clear( void ) {
 	maxarmor			= 0;
 	secretAreasDiscovered = 0;
 	Zom_points = 0;
+	Zom_doublePointsEnd = 0;
+	Zom_instaKillEnd = 0;
 
 	memset( ammo, 0, sizeof( ammo ) );
 
@@ -400,11 +402,14 @@ idInventory::Save
 void idInventory::Save( idSaveGame *savefile ) const {
 	int i;
 
-	savefile->WriteInt( maxHealth );
-	savefile->WriteInt( weapons );
-	savefile->WriteInt( powerups );
-	savefile->WriteInt( armor );
-	savefile->WriteInt( maxarmor );
+	savefile->WriteInt(maxHealth);
+	savefile->WriteInt(weapons);
+	savefile->WriteInt(powerups);
+	savefile->WriteInt(armor);
+	savefile->WriteInt(maxarmor);
+	savefile->WriteInt(Zom_points);
+	savefile->WriteInt(Zom_doublePointsEnd);
+	savefile->WriteInt(Zom_instaKillEnd);
 
 	for( i = 0; i < MAX_AMMO; i++ ) {
 		savefile->WriteInt( ammo[ i ] );
@@ -480,11 +485,14 @@ idInventory::Restore
 void idInventory::Restore( idRestoreGame *savefile ) {
 	int i, num;
 
-	savefile->ReadInt( maxHealth );
-	savefile->ReadInt( weapons );
-	savefile->ReadInt( powerups );
-	savefile->ReadInt( armor );
-	savefile->ReadInt( maxarmor );
+	savefile->ReadInt(maxHealth);
+	savefile->ReadInt(weapons);
+	savefile->ReadInt(powerups);
+	savefile->ReadInt(armor);
+	savefile->ReadInt(maxarmor);
+	savefile->ReadInt(Zom_points);
+	savefile->ReadInt(Zom_doublePointsEnd);
+	savefile->ReadInt(Zom_instaKillEnd);
 
 	for( i = 0; i < MAX_AMMO; i++ ) {
 		savefile->ReadInt( ammo[ i ] );
@@ -3440,6 +3448,28 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	//Zombies Points to show in HUD
 	_hud->SetStateInt("Zom_points", inventory.Zom_points);
 	_hud->SetStateInt("Zom_round", spawnArgs.GetInt("Zom_round", "0"));
+
+	int instaRemaining = inventory.Zom_instaKillEnd - gameLocal.time;
+	int doubleRemaining = inventory.Zom_doublePointsEnd - gameLocal.time;
+
+	bool instaVisible = instaRemaining > 0 && health > 0;
+	bool doubleVisible = doubleRemaining > 0 && health > 0;
+
+	_hud->SetStateInt("zombie_insta_visible", instaVisible);
+	_hud->SetStateInt("zombie_double_visible", doubleVisible);
+
+	_hud->SetStateString(
+		"zombie_insta_text",
+		instaVisible
+		? va("INSTA-KILL: %d", (instaRemaining + 999) / 1000)
+		: "");
+
+	_hud->SetStateString(
+		"zombie_double_text",
+		doubleVisible
+		? va("DOUBLE POINTS: %d", (doubleRemaining + 999) / 1000)
+		: "");
+
 
 	_hud->StateChanged( gameLocal.time );
 }
@@ -14083,3 +14113,70 @@ int idPlayer::CanSelectWeapon(const char* weaponName)
 }
 
 // RITUAL END
+bool idPlayer::GiveZombiePickup(const char* effect) {
+	if (gameLocal.isMultiplayer || gameLocal.isClient || spectating || health <= 0) {
+		return false;
+	}
+	if (!idStr::Icmp(effect, "max_ammo")) {
+		for (int i = 0; i < MAX_WEAPONS; i++) {
+			if (!(inventory.weapons & (1 << i))) { continue; }
+			const char* weap = spawnArgs.GetString(va("def_weapon%d", i));
+			if (!weap || !*weap) { continue; }
+			int a = inventory.AmmoIndexForWeaponIndex(i);
+			if (a <= 0 || a >= MAX_AMMO) { continue; }
+			int maximum = inventory.MaxAmmoForAmmoClass(this, rvWeapon::GetAmmoNameForIndex(a));
+			if (maximum > 0 && inventory.ammo[a] >= 0 && inventory.ammo[a] < maximum) {
+				inventory.ammo[a] = maximum;
+			}
+		}
+		ShowZombiePickupMessage("MAX AMMO!");
+		return true;
+	}
+	if (!idStr::Icmp(effect, "insta_kill")) {
+		inventory.Zom_instaKillEnd = gameLocal.time + SEC2MS(30);
+		ShowZombiePickupMessage("INSTA KILL!");
+		return true;
+	}
+	if (!idStr::Icmp(effect, "double_points")) {
+		inventory.Zom_doublePointsEnd = gameLocal.time + SEC2MS(30);
+		ShowZombiePickupMessage("DOUBLE POINTS!");
+		return true;
+	}
+	if (!idStr::Icmp(effect, "bonus_points")) {
+		inventory.Zom_points += 500;
+		ShowZombiePickupMessage("BONUS POINTS!");
+		return true;
+	}
+	if (!idStr::Icmp(effect, "nuke")) {
+		idList< idEntityPtr<idEntity> > victims;
+		for (idEntity* ent = gameLocal.spawnedEntities.Next(); ent; ent = ent->spawnNode.Next()) {
+			if (ent->IsType(idAI::GetClassType()) && ent->health > 0 && ent->spawnArgs.GetBool("zombies_enemy")) {
+				idEntityPtr<idEntity> ref;
+				ref = ent;
+				victims.Append(ref);
+			}
+		}
+		for (int i = 0; i < victims.Num(); i++) {
+			idEntity* ent = victims[i].GetEntity();
+			if (!ent || ent->health <= 0) { continue; }
+			ent->spawnArgs.SetBool("zombies_nuked", true);
+			ent->Damage(this, this, vec3_zero, "damage_zombies_nuke", 1.0f, INVALID_JOINT);
+			ent = victims[i].GetEntity();
+			if (ent && ent->health > 0) { ent->spawnArgs.SetBool("zombies_nuked", false); }
+		}
+		inventory.Zom_points += 400;
+		ShowZombiePickupMessage("NUKE!");
+		return true;
+	}
+	return false;
+}
+
+void idPlayer::ShowZombiePickupMessage(const char* message) {
+	if (!hud) {
+		return;
+	}
+
+	hud->SetStateString("zombie_pickup_message", message);
+	hud->StateChanged(gameLocal.time);
+	hud->HandleNamedEvent("zombiePowerupPickup");
+}
